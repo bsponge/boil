@@ -3,7 +3,6 @@ package graph
 import (
 	"fmt"
 
-	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/types"
 )
 
@@ -52,9 +51,3 @@ func (g *Graph) String() {
 		s += "\n"
 	}
 }
-
-/* TODO
-func NewGraphFromEvents(events []event.Event) *Graph {
-
-}
-*/
