@@ -1,9 +1,22 @@
 package main
 
 import (
-		"fmt"
+	"fmt"
+	"log"
+	"encoding/json"
+
+	"github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/example"
 )
 
 func main() {
-	fmt.Println("Hello world")
+	events := make([]event.Event, 0)
+
+	err := json.Unmarshal([]byte(example.EventsJson), &events)
+	if err != nil {
+		log.Fatal("Cannot unmarshal events")
+		return
+	}
+
+	fmt.Println(events)
 }
