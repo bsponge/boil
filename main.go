@@ -7,6 +7,7 @@ import (
 
 	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/example"
+	"github.com/bsponge/boil/graph"
 )
 
 func main() {
@@ -19,4 +20,10 @@ func main() {
 	}
 
 	fmt.Println(events)
+
+	g := graph.NewGraphFromEvents(events)
+
+	for k, v := range g.Labels {
+		fmt.Printf("Action: %s To: %s Cost: %d\n", k, v.To.Value, v.Cost)
+	}
 }
