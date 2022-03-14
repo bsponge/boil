@@ -3,8 +3,8 @@ package graph
 import (
 	"fmt"
 
-	"github.com/bsponge/boil/types"
 	"github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/types"
 )
 
 type Node struct {
@@ -55,6 +55,6 @@ func (g *Graph) String() {
 
 /* TODO
 func NewGraphFromEvents(events []event.Event) *Graph {
-	
+
 }
 */

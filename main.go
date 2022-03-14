@@ -1,9 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
-	"encoding/json"
 
 	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/example"
