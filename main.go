@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bsponge/boil/graph"
 	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/example"
+	"github.com/bsponge/boil/graph"
 )
 
 func main() {

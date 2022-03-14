@@ -3,8 +3,8 @@ package graph
 import (
 	"fmt"
 
-	"github.com/bsponge/boil/types"
 	"github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/types"
 )
 
 type Node struct {
@@ -12,8 +12,8 @@ type Node struct {
 }
 
 type Edge struct {
-	To    *Node
-	Cost  types.Cost
+	To   *Node
+	Cost types.Cost
 }
 
 type Graph struct {
