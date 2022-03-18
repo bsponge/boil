@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/example"
@@ -26,4 +27,11 @@ func main() {
 	for k, v := range g.Labels {
 		fmt.Printf("Action: %s To: %s Cost: %d\n", k, v.To.Value, v.Cost)
 	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.Body)
+		fmt.Fprintf(w, "Hello world")
+	})
+
+	http.ListenAndServe(":8080", nil)
 }

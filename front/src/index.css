@@ -1,5 +1,7 @@
 body {
   margin: 0;
+  height: 100%;
+  width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -7,7 +9,79 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+vis-network {
+  height: "1000px";
+  width: 100%;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.container {
+  width: 500px;
+  clear: both;
+}
+.container input {
+  width: 100%;
+  clear: both;
+}
+
+.myForm {
+    display: grid;
+    grid-template-areas: 
+      "customer taxi"
+      "customer extras"
+      "pickup dropoff"
+      "instructions instructions"
+      "submit submit";
+  	grid-template-columns: auto auto;  
+  	grid-template-rows: auto auto auto auto;
+    grid-gap: .8em .5em;
+    background: #eee;
+    padding: 1.2em;
+  }
+  .myForm textarea {
+    height: calc(100% - 1.5em);
+    }
+  .myForm button {
+    background: gray;
+    color: white;
+    padding: 1em;
+    }
+  .myForm input:not([type=radio]):not([type=checkbox]), 
+  .myForm textarea, 
+  .myForm select {
+   	width: 100%;
+    border: 0;
+    padding: 1em;
+    margin: .5em 0;
+  }
+  .myForm label {
+   display: block; 
+  }
+  fieldset {
+    border: 0;
+  }
+  #customer {
+    grid-area: customer;
+  }
+  #taxi {
+    grid-area: taxi;
+  }
+  #extras {
+    grid-area: extras;
+  }
+  #pickup {
+    grid-area: pickup;
+  }
+  #dropoff {
+    grid-area: dropoff;
+  }
+  #instructions {
+    grid-area: instructions;
+  }
+  #submit {
+    grid-area: submit;
+  }
