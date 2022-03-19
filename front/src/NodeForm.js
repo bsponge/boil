@@ -37,7 +37,15 @@ class NodeForm extends React.Component {
 
     submit(event) {
         event.preventDefault()
-        const node = {...this.state}
+        var node = {
+            action: this.state.action,
+            precedingActions: [],
+            duration: this.state.duration
+        }
+        const precedingActions = this.state.precedingActions.split(',')
+        for (const str of precedingActions) {
+            node.precedingActions.push(str.trim())
+        }
         this.props.func(node)
         this.clearState()
     }
@@ -51,7 +59,7 @@ class NodeForm extends React.Component {
                     <label>Preceding actions:</label>
                     <input type="text" value={this.state.precedingActions} onChange={this.setPrecedingActions} /><br />
                     <label>Duration</label>
-                    <input type="text" value={this.state.duration} onChange={this.setDuration} /><br />
+                    <input type="number" min="0" value={this.state.duration} onChange={this.setDuration} /><br />
                     <button class="formButton" onClick={this.submit}>Submit</button>
                 </form>
             </div>

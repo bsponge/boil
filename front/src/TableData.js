@@ -7,9 +7,29 @@ class TableData extends React.Component {
         this.state = {
             nodes: []
         }
+        for (const node of props.graph.nodes) {
+            this.state.nodes.push({
+                action: node.id,
+                precedingActions: [],
+                duration: 0
+            })
+        }
+
+        for (const edge of props.graph.edges) {
+            for (var i = 0; i < this.state.nodes.length; i++) {
+                if (edge.to === this.state.nodes[i].action) {
+                    this.state.nodes[i].precedingActions.push(edge.from)
+                }
+            }
+        }
 
         this.getNodes = this.getNodes.bind(this)
         this.addNode = this.addNode.bind(this)
+        this.callback = this.callback.bind(this)
+    }
+
+    callback() {
+        this.props.updateCallback(this.state.nodes)
     }
 
     getNodes() {
@@ -27,13 +47,14 @@ class TableData extends React.Component {
     addNode(node) {
         var nodes = this.state.nodes
         nodes.push(node)
+        this.callback()
         this.setState({nodes: nodes})
     }
 
     render() {
         return (
             <div>
-                <NodeForm func={this.addNode}/>
+                <NodeForm func={this.addNode} updateCallback={this.callback}/>
                 <table className="table table-stripped">
                     <thead>
                         <tr>

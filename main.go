@@ -7,35 +7,26 @@ import (
 	"net/http"
 
 	"github.com/bsponge/boil/event"
-	"github.com/bsponge/boil/example"
-	"github.com/bsponge/boil/graph"
 )
 
 func main() {
-	events := make([]event.Event, 0)
-
-	err := json.Unmarshal([]byte(example.EventsJson), &events)
-	if err != nil {
-		log.Fatal("Cannot unmarshal events")
-		return
-	}
-
-	fmt.Println(events)
-
-	g := graph.NewGraphFromEvents(events)
-
-	for k, v := range g.Labels {
-		fmt.Printf("Action: %s To: %s Cost: %d\n", k, v.To.Value, v.Cost)
-	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.Body)
-		fmt.Fprintf(w, "Hello world")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+
+		if r.Method == "POST" {
+			actions := []event.Event{}
+			err := json.NewDecoder(r.Body).Decode(&actions)
+			if err != nil {
+				log.Fatal("Cannot decode json")
+			}
+			fmt.Println(actions)
+		}
 	})
 
-	err = http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatal("HTTP server error")
+		log.Fatal("HTTP server error", err)
 		return
 	}
 }
