@@ -42,9 +42,10 @@ class NodeForm extends React.Component {
             precedingActions: [],
             duration: this.state.duration
         }
-        const precedingActions = this.state.precedingActions.split(',')
-        for (const str of precedingActions) {
-            node.precedingActions.push(str.trim())
+        console.log(this.state.precedingActions)
+        if (typeof this.state.precedingActions == "string") {
+            const precedingActions = this.state.precedingActions.replace(/\s/g, "").split(',')
+            node.precedingActions.push(...precedingActions)
         }
         this.props.func(node)
         this.clearState()
