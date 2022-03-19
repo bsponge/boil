@@ -44,14 +44,16 @@ class NodeForm extends React.Component {
 
     render() {
         return (
-            <div>
-                <label>Action:</label>
-                <input type="text" value={this.state.action} onChange={this.setAction}/><br/>
-                <label>Preceding actions:</label>
-                <input type="text" value={this.state.precedingActions} onChange={this.setPrecedingActions}/><br />
-                <label>Duration</label>
-                <input type="text" value={this.state.duration} onChange={this.setDuration}/><br />
-                <button onClick={this.submit}>Submit</button>
+            <div class="form-style-5">
+                <form>
+                    <label>Action:</label>
+                    <input type="text" value={this.state.action} onChange={this.setAction} /><br />
+                    <label>Preceding actions:</label>
+                    <input type="text" value={this.state.precedingActions} onChange={this.setPrecedingActions} /><br />
+                    <label>Duration</label>
+                    <input type="text" value={this.state.duration} onChange={this.setDuration} /><br />
+                    <button class="formButton" onClick={this.submit}>Submit</button>
+                </form>
             </div>
         )
     }

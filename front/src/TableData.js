@@ -33,6 +33,7 @@ class TableData extends React.Component {
     render() {
         return (
             <div>
+                <NodeForm func={this.addNode}/>
                 <table className="table table-stripped">
                     <thead>
                         <tr>
@@ -43,7 +44,6 @@ class TableData extends React.Component {
                     </thead>
                     <tbody>{this.getNodes()}</tbody>
                 </table>
-                <NodeForm func={this.addNode}/>
             </div>
         )
     }
