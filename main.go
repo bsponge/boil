@@ -7,9 +7,19 @@ import (
 	"net/http"
 
 	"github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/linkedlist"
+	"github.com/bsponge/boil/types"
 )
 
 func main() {
+	l := &linkedlist.LinkedList[types.Item]{}
+	for i := 1; i < 14; i++ {
+		s := types.Item(fmt.Sprintf("%v", i))
+		l.AddNode(&s)
+	}
+
+	fmt.Println(l)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
