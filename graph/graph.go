@@ -25,9 +25,9 @@ type Graph struct {
 	AdjacencyList []linkedlist.LinkedList[Edge]
 }
 
-func New() *Graph {
+func New(size int) *Graph {
 	return &Graph{
-		AdjacencyList: make([]linkedlist.LinkedList[Edge], 0),
+		AdjacencyList: make([]linkedlist.LinkedList[Edge], size),
 	}
 }
 
@@ -37,10 +37,6 @@ func (g *Graph) AddEdge(source, destination uint, cost types.Cost, label string)
 		Destination: destination,
 		Cost: cost,
 		Label: label,
-	}
-
-	for ; uint(len(g.AdjacencyList)) < source+1; {
-		g.AdjacencyList = append(g.AdjacencyList, linkedlist.LinkedList[Edge]{})
 	}
 
 	g.AdjacencyList[source].AddNode(edge)
@@ -59,28 +55,80 @@ func (g *Graph) findNode(label string) (uint, error) {
 }
 
 func NewGraphFromEvents(events []event.Event) (*Graph, error) {
-	g := New()
-	nodeNum := uint(1)
+	size := 1
+	for _, e := range events {
+		if len(e.PrecedingActions) != 0 {
+			size++
+		}
+	}
+
+	eventsMap := map[string]event.Event{}
+	endingEvents := map[string]struct{}{}
+	for _, e := range events {
+		eventsMap[string(e.Action)] = e
+		endingEvents[string(e.Action)] = struct{}{}
+	}
+
 
 	for _, e := range events {
-
-		if len(e.PrecedingActions) == 0 {
-			g.AddEdge(0, nodeNum, e.Duration, string(e.Action))
-		} else {
-			for _, precEvent := range e.PrecedingActions {
-				prevNode, err := g.findNode(string(precEvent))
-				if err != nil {
-					return nil, fmt.Errorf("Cannot create graph: %s", err)
-				}
-
-				g.AddEdge(prevNode, nodeNum, e.Duration, string(e.Action))
-			}
+		for _, prec := range e.PrecedingActions {
+			delete(endingEvents, string(prec))
 		}
+	}
 
-		nodeNum++
+	g := New(size)
+
+	for k, _ := range endingEvents {
+		g.createGraph(string(k), eventsMap)
 	}
 
 	return g, nil
+}
+
+func Index(l linkedlist.LinkedList[Edge], label string) (uint, error) {
+	var idx uint	
+	idx = 0
+
+	for n := l.Node; n != nil; n = n.Next {
+		if n.Value.Label == label {
+			return idx, nil
+		}
+		idx++
+	}
+
+	return idx, fmt.Errorf("Cannot find edge with label %s", label)
+}
+
+// createGraph returns number of a preceding node
+func (g *Graph) createGraph(eventName string, eventsMap map[string]event.Event) uint {
+	var biggestNodeNum uint
+	biggestNodeNum = 0
+	precNodeNums := make([]uint, 1)
+	for _, precEvent := range eventsMap[eventName].PrecedingActions {
+		precNodeNum := g.createGraph(string(precEvent), eventsMap)
+		precNodeNums = append(precNodeNums, precNodeNum)
+		if precNodeNum > biggestNodeNum {
+			biggestNodeNum = precNodeNum
+		}
+	}
+
+	e := eventsMap[eventName]
+
+	if biggestNodeNum == 0 {
+		nodeNum, err := Index(g.AdjacencyList[0], eventName)
+		if err != nil {
+			nodeNum++
+			g.AddEdge(0, nodeNum, e.Duration, string(e.Action))
+		}
+		return nodeNum
+	} else {
+		nodeNum := biggestNodeNum+1
+		for i, precNodeNum := range precNodeNums {
+			precEvent := eventsMap[string(e.PrecedingActions[i])]
+			g.AddEdge(precNodeNum, nodeNum, precEvent.Duration, string(precEvent.Action))
+		}
+		return nodeNum
+	}
 }
 
 func (g *Graph) String() string {
@@ -89,9 +137,34 @@ func (g *Graph) String() string {
 	for i, list := range g.AdjacencyList {
 		s += fmt.Sprintf("node: %d\n", i)
 		for n := list.Node; n != nil; n = n.Next {
-			s += fmt.Sprintf("\tedge: %s\n", n.Value.Label)
+			s += fmt.Sprintf("\tedge: %s, from: %d, to: %d\n", n.Value.Label, n.Value.Source, n.Value.Destination)
 		}
 	}
 
 	return s
+}
+
+func (g *Graph) StepForward() error {
+	return g.stepForward(0, 0)
+}
+
+func (g *Graph) stepForward(startValue types.Cost, idx uint) error {
+	list := g.AdjacencyList[idx]
+	for node := list.Node; node != nil; node = node.Next {
+		if node.Value.EarliestStart < startValue {
+			node.Value.EarliestStart = startValue
+			node.Value.EarliestFinish = node.Value.EarliestStart + node.Value.Cost
+		}
+
+		err := g.stepForward(node.Value.EarliestFinish, node.Value.Destination)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (g *Graph) StepBackward() error {
+	return nil
 }

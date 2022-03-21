@@ -28,6 +28,11 @@ func main() {
 
 	fmt.Println(g)
 
+	err = g.StepForward()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	/*
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")

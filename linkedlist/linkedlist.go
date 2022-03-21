@@ -28,6 +28,14 @@ func (l *LinkedList[T]) AddNode(value *T) {
 	}
 }
 
+func (l *LinkedList[T]) Len() int {
+	size := 0
+	for n := l.Node; n != nil; n = n.Next {
+		size++
+	}
+
+	return size
+}
 
 func (l *LinkedList[T]) String() string {
 	s := ""
