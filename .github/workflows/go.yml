@@ -12,10 +12,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
-      
-    - name: Linter
-      uses: golangci/golangci-lint-action@v3.1.0
+        go-version: 1.18
       
     - name: Build
       run: go build -v ./...

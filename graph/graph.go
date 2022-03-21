@@ -3,81 +3,95 @@ package graph
 import (
 	"fmt"
 
-	"github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/linkedlist"
 	"github.com/bsponge/boil/types"
+	"github.com/bsponge/boil/event"
 )
 
-type Node struct {
-	Value types.Item
-}
-
 type Edge struct {
-	To   *Node
-	Cost types.Cost
+	Source         uint
+	Destination    uint
+	Cost           types.Cost
+	Label          string
+	EarliestStart  types.Cost
+	EarliestFinish types.Cost
+	LatestStart    types.Cost
+	LatestFinish   types.Cost
+	Reserve        types.Cost
+	Critical       bool
 }
 
 type Graph struct {
-	Nodes  []*Node
-	Edges  map[Node][]*Edge
-	Labels map[types.Item]*Edge
+	AdjacencyList []linkedlist.LinkedList[Edge]
 }
 
-func (n *Node) String() string {
-	return fmt.Sprintf("%v", n.Value)
-}
-
-func (e Edge) String() string {
-	return fmt.Sprintf("%v", e.Cost)
-}
-
-func (g *Graph) AddNode(n *Node) {
-	g.Nodes = append(g.Nodes, n)
-}
-
-func (g *Graph) AddEdge(from, to *Node, cost types.Cost, label types.Item) {
-	if g.Edges == nil {
-		g.Edges = make(map[Node][]*Edge)
-	}
-
-	e := &Edge{to, cost}
-	g.Edges[*from] = append(g.Edges[*from], e)
-	g.Labels[label] = e
-}
-
-func (g *Graph) String() {
-	s := ""
-	for i := 0; i < len(g.Nodes); i++ {
-		s += g.Nodes[i].String() + " -> "
-		near := g.Edges[*g.Nodes[i]]
-		for j := 0; j < len(near); j++ {
-			s += near[j].String() + " "
-		}
-		s += "\n"
+func New() *Graph {
+	return &Graph{
+		AdjacencyList: make([]linkedlist.LinkedList[Edge], 0),
 	}
 }
 
-func NewGraphFromEvents(events []event.Event) *Graph {
-	nodeValue := 'b'
+func (g *Graph) AddEdge(source, destination uint, cost types.Cost, label string) {
+	edge := &Edge {
+		Source: source,
+		Destination: destination,
+		Cost: cost,
+		Label: label,
+	}
 
-	g := Graph{}
-	g.Labels = make(map[types.Item]*Edge)
+	for ; uint(len(g.AdjacencyList)) < source+1; {
+		g.AdjacencyList = append(g.AdjacencyList, linkedlist.LinkedList[Edge]{})
+	}
 
-	startNode := &Node{"a"}
-	g.AddNode(startNode)
+	g.AdjacencyList[source].AddNode(edge)
+}
 
-	for _, e := range events {
-		n := &Node{types.Item(nodeValue)}
-		nodeValue++
-		g.AddNode(n)
-
-		if len(e.PrecedingActions) == 0 {
-			g.AddEdge(startNode, n, e.Duration, e.Action)
-		} else {
-			for _, a := range e.PrecedingActions {
-				g.AddEdge(g.Labels[a].To, n, e.Duration, e.Action)
+func (g *Graph) findNode(label string) (uint, error) {
+	for _, list := range g.AdjacencyList {
+		for n := list.Node; n != nil; n = n.Next {
+			if n.Value.Label == label {
+				return n.Value.Destination, nil
 			}
 		}
 	}
 
-	return &g
+	return 0, fmt.Errorf("Cannot find node with edge %s", label)
+}
+
+func NewGraphFromEvents(events []event.Event) (*Graph, error) {
+	g := New()
+	nodeNum := uint(1)
+
+	for _, e := range events {
+
+		if len(e.PrecedingActions) == 0 {
+			g.AddEdge(0, nodeNum, e.Duration, string(e.Action))
+		} else {
+			for _, precEvent := range e.PrecedingActions {
+				prevNode, err := g.findNode(string(precEvent))
+				if err != nil {
+					return nil, fmt.Errorf("Cannot create graph: %s", err)
+				}
+
+				g.AddEdge(prevNode, nodeNum, e.Duration, string(e.Action))
+			}
+		}
+
+		nodeNum++
+	}
+
+	return g, nil
+}
+
+func (g *Graph) String() string {
+	s := ""
+
+	for i, list := range g.AdjacencyList {
+		s += fmt.Sprintf("node: %d\n", i)
+		for n := list.Node; n != nil; n = n.Next {
+			s += fmt.Sprintf("\tedge: %s\n", n.Value.Label)
+		}
+	}
+
+	return s
 }

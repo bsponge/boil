@@ -11,19 +11,42 @@ import (
 )
 
 func main() {
-	events := make([]event.Event, 0)
-
-	err := json.Unmarshal([]byte(example.EventsJson), &events)
+	actions := []event.Event{}
+	err := json.Unmarshal([]byte(example.EventsJson), &actions)
 	if err != nil {
-		log.Fatal("Cannot unmarshal events")
+		log.Fatal(err)
 		return
 	}
 
-	fmt.Println(events)
+	fmt.Println(actions)
 
-	g := graph.NewGraphFromEvents(events)
-
-	for k, v := range g.Labels {
-		fmt.Printf("Action: %s To: %s Cost: %d\n", k, v.To.Value, v.Cost)
+	g, err := graph.NewGraphFromEvents(actions)
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
+
+	fmt.Println(g)
+
+	/*
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+
+			if r.Method == "POST" {
+				actions := []event.Event{}
+				err := json.NewDecoder(r.Body).Decode(&actions)
+				if err != nil {
+					log.Fatal("Cannot decode json")
+				}
+				fmt.Println(actions)
+			}
+		})
+
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			log.Fatal("HTTP server error", err)
+			return
+		}
+	*/
 }
