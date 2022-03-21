@@ -1,38 +1,28 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 
-	"github.com/bsponge/boil/event"
-	"github.com/bsponge/boil/example"
 	"github.com/bsponge/boil/graph"
 )
 
 func main() {
-	actions := []event.Event{}
-	err := json.Unmarshal([]byte(example.EventsJson), &actions)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	g := graph.New(6)
 
-	fmt.Println(actions)
+	g.AddEdge(0, 1, 5, "A")
+	g.AddEdge(0, 2, 7, "B")
+	g.AddEdge(1, 3, 6, "C")
+	g.AddEdge(1, 4, 8, "D")
+	g.AddEdge(2, 4, 3, "E")
+	g.AddEdge(3, 4, 4, "F")
+	g.AddEdge(3, 5, 2, "G")
+	g.AddEdge(4, 5, 5, "H")
 
-	g, err := graph.NewGraphFromEvents(actions)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	g.StepForward()
 
-	fmt.Println(g)
+	g.StepBackward()
 
-	err = g.StepForward()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	fmt.Println(g.String())
 	/*
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")

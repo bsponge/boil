@@ -3,9 +3,9 @@ package graph
 import (
 	"fmt"
 
+	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/linkedlist"
 	"github.com/bsponge/boil/types"
-	"github.com/bsponge/boil/event"
 )
 
 type Edge struct {
@@ -23,20 +23,22 @@ type Edge struct {
 
 type Graph struct {
 	AdjacencyList []linkedlist.LinkedList[Edge]
+	Preceding     []linkedlist.LinkedList[Edge]
 }
 
 func New(size int) *Graph {
 	return &Graph{
 		AdjacencyList: make([]linkedlist.LinkedList[Edge], size),
+		Preceding:     make([]linkedlist.LinkedList[Edge], size),
 	}
 }
 
 func (g *Graph) AddEdge(source, destination uint, cost types.Cost, label string) {
-	edge := &Edge {
-		Source: source,
+	edge := &Edge{
+		Source:      source,
 		Destination: destination,
-		Cost: cost,
-		Label: label,
+		Cost:        cost,
+		Label:       label,
 	}
 
 	g.AdjacencyList[source].AddNode(edge)
@@ -69,7 +71,6 @@ func NewGraphFromEvents(events []event.Event) (*Graph, error) {
 		endingEvents[string(e.Action)] = struct{}{}
 	}
 
-
 	for _, e := range events {
 		for _, prec := range e.PrecedingActions {
 			delete(endingEvents, string(prec))
@@ -86,7 +87,7 @@ func NewGraphFromEvents(events []event.Event) (*Graph, error) {
 }
 
 func Index(l linkedlist.LinkedList[Edge], label string) (uint, error) {
-	var idx uint	
+	var idx uint
 	idx = 0
 
 	for n := l.Node; n != nil; n = n.Next {
@@ -122,7 +123,7 @@ func (g *Graph) createGraph(eventName string, eventsMap map[string]event.Event) 
 		}
 		return nodeNum
 	} else {
-		nodeNum := biggestNodeNum+1
+		nodeNum := biggestNodeNum + 1
 		for i, precNodeNum := range precNodeNums {
 			precEvent := eventsMap[string(e.PrecedingActions[i])]
 			g.AddEdge(precNodeNum, nodeNum, precEvent.Duration, string(precEvent.Action))
@@ -137,7 +138,9 @@ func (g *Graph) String() string {
 	for i, list := range g.AdjacencyList {
 		s += fmt.Sprintf("node: %d\n", i)
 		for n := list.Node; n != nil; n = n.Next {
-			s += fmt.Sprintf("\tedge: %s, from: %d, to: %d\n", n.Value.Label, n.Value.Source, n.Value.Destination)
+			s += fmt.Sprintf("\tedge: %s, from: %d, to: %d, ES: %d, EF: %d, LS: %d, LF: %d\n",
+				n.Value.Label, n.Value.Source, n.Value.Destination, n.Value.EarliestStart,
+				n.Value.EarliestFinish, n.Value.LatestStart, n.Value.LatestFinish)
 		}
 	}
 
@@ -145,13 +148,28 @@ func (g *Graph) String() string {
 }
 
 func (g *Graph) StepForward() error {
-	return g.stepForward(0, 0)
+	err := g.stepForward(0, 0)
+	for _, list := range g.AdjacencyList {
+		for node := list.Node; node != nil; node = node.Next {
+			edge := &Edge{
+				Source:         node.Value.Destination,
+				Destination:    node.Value.Source,
+				Cost:           node.Value.Cost,
+				Label:          node.Value.Label,
+				EarliestStart:  node.Value.EarliestStart,
+				EarliestFinish: node.Value.EarliestFinish,
+			}
+			g.Preceding[node.Value.Destination].AddNode(edge)
+		}
+	}
+
+	return err
 }
 
 func (g *Graph) stepForward(startValue types.Cost, idx uint) error {
 	list := g.AdjacencyList[idx]
 	for node := list.Node; node != nil; node = node.Next {
-		if node.Value.EarliestStart < startValue {
+		if node.Value.EarliestStart <= startValue {
 			node.Value.EarliestStart = startValue
 			node.Value.EarliestFinish = node.Value.EarliestStart + node.Value.Cost
 		}
@@ -166,5 +184,30 @@ func (g *Graph) stepForward(startValue types.Cost, idx uint) error {
 }
 
 func (g *Graph) StepBackward() error {
+	var biggestEF types.Cost
+	biggestEF = 0
+	for edge := g.Preceding[len(g.Preceding)-1].Node; edge != nil; edge = edge.Next {
+		fmt.Println(edge.Value.EarliestFinish)
+		if edge.Value.EarliestFinish > biggestEF {
+			biggestEF = edge.Value.EarliestFinish
+		}
+	}
+	return g.stepBackward(biggestEF, uint(len(g.Preceding)-1))
+}
+
+func (g *Graph) stepBackward(startValue types.Cost, idx uint) error {
+	fmt.Println("startvalue", startValue)
+	for node := g.Preceding[idx].Node; node != nil; node = node.Next {
+		if node.Value.LatestFinish >= startValue {
+			node.Value.LatestFinish = startValue
+			node.Value.LatestStart = node.Value.LatestFinish - node.Value.Cost
+		}
+
+		err := g.stepBackward(node.Value.LatestStart, node.Value.Destination)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

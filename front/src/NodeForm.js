@@ -7,7 +7,8 @@ class NodeForm extends React.Component {
 
         this.state = new Node()
         this.setAction = this.setAction.bind(this)
-        this.setPrecedingActions = this.setPrecedingActions.bind(this)
+        this.setSource = this.setSource.bind(this)
+        this.setDestination = this.setDestination.bind(this)
         this.setDuration = this.setDuration.bind(this)
         this.clearState = this.clearState.bind(this)
         this.submit = this.submit.bind(this)
@@ -19,11 +20,17 @@ class NodeForm extends React.Component {
         this.setState(state)
     }
 
-    setPrecedingActions(event) {
+    setSource(event) {
         var state = { ...this.state }
-        state.precedingActions = event.target.value
+        state.source = event.target.value
         this.setState(state)
     }
+
+	setDestination(event) {
+		var state = { ...this.state }
+		state.destination = event.target.value
+		this.setState(state)
+	}
 
     setDuration(event) {
         var state = { ...this.state }
@@ -43,10 +50,6 @@ class NodeForm extends React.Component {
             duration: this.state.duration
         }
         console.log(this.state.precedingActions)
-        if (typeof this.state.precedingActions == "string") {
-            const precedingActions = this.state.precedingActions.replace(/\s/g, "").split(',')
-            node.precedingActions.push(...precedingActions)
-        }
         this.props.func(node)
         this.clearState()
     }
@@ -57,9 +60,11 @@ class NodeForm extends React.Component {
                 <form>
                     <label>Action:</label>
                     <input type="text" value={this.state.action} onChange={this.setAction} /><br />
-                    <label>Preceding actions:</label>
-                    <input type="text" value={this.state.precedingActions} onChange={this.setPrecedingActions} /><br />
-                    <label>Duration</label>
+                    <label>Source:</label>
+		<input type="text" value={this.state.source} onChange={this.setSource} /><br />
+		<label>Destination:</label>
+		<input type="text" value={this.state.destination} onChange={this.setDestination} /><br />
+		<label>Duration</label>
                     <input type="number" min="0" value={this.state.duration} onChange={this.setDuration} /><br />
                     <button class="formButton" onClick={this.submit}>Submit</button>
                 </form>

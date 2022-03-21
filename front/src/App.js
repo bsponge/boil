@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import TableData from './TableData'
 
 async function fetchGraph(graph) {
+	/*
   const response = await fetch('http://localhost:8080/', {
     method: "POST",
     headers: {
@@ -15,6 +16,22 @@ async function fetchGraph(graph) {
     body: JSON.stringify(graph)
   })
   return await response.json()
+  */
+	return {
+		nodes: [
+			{ id: "A", label: "Node 1", title: "node 1 tooltip text" },
+			{ id: "B", label: "Node 2", title: "node 2 tooltip text" },
+			{ id: "C", label: "Node 3", title: "node 3 tooltip text" },
+			{ id: "D", label: "Node 4", title: "node 4 tooltip text" },
+			{ id: "E", label: "Node 5", title: "node 5 tooltip text" },
+		],
+		edges: [
+			{ from: "A", to: "B"},
+			{ from: "A", to: "C" },
+			{ from: "B", to: "D" },
+			{ from: "B", to: "E" },
+		]
+	}
 }
 
 function Face(props) {
@@ -24,9 +41,9 @@ function Face(props) {
       updateCallback={props.updateCallback}
     />
   } else {
-    const response = fetchGraph(props.graph)
-    return < Graph
-      graph={response}
+    //const response = fetchGraph(props.graph)
+    return <Graph
+      graph={props.graph}
       options={props.options}
       events={props.events}
       style={{ height: "800px" }}
@@ -49,7 +66,7 @@ class App extends React.Component {
           { id: "E", label: "Node 5", title: "node 5 tooltip text" },
         ],
         edges: [
-          { from: "A", to: "B" },
+          { from: "A", to: "B", label: "JFKDSLFDS", color: "red" },
           { from: "A", to: "C" },
           { from: "B", to: "D" },
           { from: "B", to: "E" },

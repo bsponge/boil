@@ -10,7 +10,8 @@ class TableData extends React.Component {
         for (const node of props.graph.nodes) {
             this.state.nodes.push({
                 action: node.id,
-                precedingActions: [],
+		source: node.source,
+		destination: node.destination,
                 duration: 0
             })
         }
@@ -18,7 +19,8 @@ class TableData extends React.Component {
         for (const edge of props.graph.edges) {
             for (var i = 0; i < this.state.nodes.length; i++) {
                 if (edge.to === this.state.nodes[i].action) {
-                    this.state.nodes[i].precedingActions.push(edge.from)
+                    this.state.nodes[i].source = edge.from
+                    this.state.nodes[i].destination = edge.to
                 }
             }
         }
@@ -37,7 +39,8 @@ class TableData extends React.Component {
             return (
                 <tr key={node.action}>
                     <td>{node.action}</td>
-                    <td>{node.precedingActions}</td>
+                    <td>{node.source}</td>
+                    <td>{node.destination}</td>
                     <td>{node.duration}</td>
                 </tr>
             )
@@ -59,7 +62,8 @@ class TableData extends React.Component {
                     <thead>
                         <tr>
                             <th>Action</th>
-                            <th>Preceding actions</th>
+                            <th>Source</th>
+                            <th>Destination</th>
                             <th>Duration</th>
                         </tr>
                     </thead>
