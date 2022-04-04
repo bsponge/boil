@@ -158,6 +158,7 @@ func (g *Graph) StepForward() error {
 				Label:          node.Value.Label,
 				EarliestStart:  node.Value.EarliestStart,
 				EarliestFinish: node.Value.EarliestFinish,
+				LatestFinish:   types.Cost(99999999),
 			}
 			g.Preceding[node.Value.Destination].AddNode(edge)
 		}
@@ -187,16 +188,16 @@ func (g *Graph) StepBackward() error {
 	var biggestEF types.Cost
 	biggestEF = 0
 	for edge := g.Preceding[len(g.Preceding)-1].Node; edge != nil; edge = edge.Next {
-		fmt.Println(edge.Value.EarliestFinish)
 		if edge.Value.EarliestFinish > biggestEF {
 			biggestEF = edge.Value.EarliestFinish
 		}
 	}
-	return g.stepBackward(biggestEF, uint(len(g.Preceding)-1))
+	g.stepBackward(biggestEF, uint(len(g.Preceding)-1))
+	g.cpy()
+	return nil
 }
 
 func (g *Graph) stepBackward(startValue types.Cost, idx uint) error {
-	fmt.Println("startvalue", startValue)
 	for node := g.Preceding[idx].Node; node != nil; node = node.Next {
 		if node.Value.LatestFinish >= startValue {
 			node.Value.LatestFinish = startValue
@@ -210,4 +211,27 @@ func (g *Graph) stepBackward(startValue types.Cost, idx uint) error {
 	}
 
 	return nil
+}
+
+func (g *Graph) getEdge(label string) *Edge {
+	for _, list := range g.AdjacencyList {
+		for node := list.Node; node != nil; node = node.Next {
+			if node.Value.Label == label {
+				return node.Value
+			}
+		}
+	}
+	return nil
+}
+
+func (g *Graph) cpy() {
+	for _, list := range g.Preceding {
+		for node := list.Node; node != nil; node = node.Next {
+			edge := g.getEdge(node.Value.Label)
+			if edge != nil {
+				edge.LatestStart = node.Value.LatestStart
+				edge.LatestFinish = node.Value.LatestFinish
+			}
+		}
+	}
 }
