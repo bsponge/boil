@@ -138,9 +138,9 @@ func (g *Graph) String() string {
 	for i, list := range g.AdjacencyList {
 		s += fmt.Sprintf("node: %d\n", i)
 		for n := list.Node; n != nil; n = n.Next {
-			s += fmt.Sprintf("\tedge: %s, from: %d, to: %d, ES: %d, EF: %d, LS: %d, LF: %d\n",
+			s += fmt.Sprintf("\tedge: %s, from: %d, to: %d, ES: %d, EF: %d, LS: %d, LF: %d, R: %d\n",
 				n.Value.Label, n.Value.Source, n.Value.Destination, n.Value.EarliestStart,
-				n.Value.EarliestFinish, n.Value.LatestStart, n.Value.LatestFinish)
+				n.Value.EarliestFinish, n.Value.LatestStart, n.Value.LatestFinish, n.Value.Reserve)
 		}
 	}
 
@@ -202,6 +202,7 @@ func (g *Graph) stepBackward(startValue types.Cost, idx uint) error {
 		if node.Value.LatestFinish >= startValue {
 			node.Value.LatestFinish = startValue
 			node.Value.LatestStart = node.Value.LatestFinish - node.Value.Cost
+			node.Value.Reserve = node.Value.LatestStart - node.Value.EarliestStart
 		}
 
 		err := g.stepBackward(node.Value.LatestStart, node.Value.Destination)
@@ -231,7 +232,33 @@ func (g *Graph) cpy() {
 			if edge != nil {
 				edge.LatestStart = node.Value.LatestStart
 				edge.LatestFinish = node.Value.LatestFinish
+				edge.Reserve = node.Value.Reserve
 			}
 		}
 	}
+}
+
+func (g *Graph) cpm(idx uint, s string) string {
+	for node := g.AdjacencyList[idx].Node; node != nil; node = node.Next {
+		if node.Value.Reserve == 0 {
+			s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
+			s += g.cpm(node.Value.Destination, "")
+		}
+	}
+	return s
+}
+
+func (g *Graph) CPM() string {
+	g.StepForward()
+	g.StepBackward()
+
+	cpm := ""
+
+	for node := g.AdjacencyList[0].Node; node != nil; node = node.Next {
+		if node.Value.Reserve == 0 {
+			cpm += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
+			cpm += g.cpm(node.Value.Destination, "")
+		}
+	}
+	return cpm
 }

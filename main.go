@@ -18,11 +18,11 @@ func main() {
 	g.AddEdge(3, 5, 2, "G")
 	g.AddEdge(4, 5, 5, "H")
 
-	g.StepForward()
-
-	g.StepBackward()
+	path := g.CPM()
 
 	fmt.Println(g.String())
+
+	fmt.Println(path)
 	/*
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
