@@ -74,20 +74,15 @@ func main() {
 			for _, pr := range parser {
 				// fmt.Println("loooop: source ", action.Source, " dest: ", action.Destination, " time: ", action.Duration, " l = ", action.Label)
 				source, err := strconv.ParseUint(pr.Source, 10, 32)
-				println("parsed: source = ", source)
 				destination, err1 := strconv.ParseUint(pr.Destination, 10, 32)
-
-				println("parsed: dest = ", destination)
 
 				duration, err2 := strconv.ParseUint(pr.Duration, 10, 32)
 				// println("parsed: cost = ", duration)
 
-				println("in loop: parser label = ", pr.Action)
 				// g.AddEdge(action.Source, action.Destination, action.Duration, action.Label)
 				if err != nil && err1 != nil && err2 != nil {
 					fmt.Println("Error caught!")
 				} else {
-					println("adding: ", source, destination, pr.Action)
 					g.AddEdge(uint(source), uint(destination), types.Cost(duration), pr.Action)
 				}
 

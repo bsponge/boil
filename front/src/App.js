@@ -51,6 +51,8 @@ function Face(props) {
   }
 }
 
+var cpmLabels = []
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -80,6 +82,10 @@ class App extends React.Component {
 
   // convert activities to graph
   convertNodes(activityArray){
+  
+    // convert undefinded labels to string
+    for(var i = 0; i < cpmLabels.length; i++) String(cpmLabels[i])
+
     this.graph = {
       edges: [],
       nodes:[]
@@ -101,43 +107,34 @@ class App extends React.Component {
       }
     }
 
+    for(var i = 0; i < cpmLabels.length; i++) console.log( cpmLabels[i])
     for(var i = 0; i < activityArray.length; i++){
-      var edge = { from: activityArray[i].source, to: activityArray[i].destination, label: activityArray[i].action+activityArray[i].duration}
+      var col
+      var checker = String(activityArray[i].action)
+
+      if(cpmLabels.includes(checker))
+        col = "red"
+        else
+        col = "black"
+
+      var edge = { from: activityArray[i].source, to: activityArray[i].destination, label: activityArray[i].action+activityArray[i].duration, color: col}
       this.graph.edges.push(edge)
     }
 
-
+    
     return this.graph
   }
   
 
-  // function to paint CPM red
-  paintCPM(data, edges){
-    var parsedData = JSON.parse(data)
-    console.log("CPM PAINTING")
-    console.log(parsedData)
-    // for(var i = 0; i < edges.length; i++){
-    //   var strCheck = Array.from(edges[i].label)
-    //   for(var j = 0; j < data.length; j++){
-    //     console.log("INSIDE LOOP")
-    //     console.log("strcheck = ", strCheck[0])
-    //     console.log("data.action = ", parsedData[j].action)
-    //       if(parsedData[j].action == strCheck[0]){
-    //         console.log("IM HERE!")
-    //         edges[i].color = "red"
-    //     }
-    //   }
-      
-    // }
-  }
-
   edit(event) {
     
     const data = JSON.stringify(this.state.graph) // save data to post
-    console.log("SENDING: "+data)
-    this.state.graph = this.convertNodes(this.state.graph)
-    
 
+    JSON.stringify(data)
+    console.log("SENDING: "+data)
+    // this.state.graph = this.convertNodes(this.state.graph)
+    
+    // const cpmLabels = [] // labels of CPM edges
     // get CPM from server alghoritm
     fetch('http://localhost:8080/',{
       method: 'POST',
@@ -148,17 +145,30 @@ class App extends React.Component {
     })
     .then((response)=>response.json())
     .then((data)=>{
-      // var CPM = data
-      this.paintCPM(data, this.state.graph.edges)
-      // console.log('SUCCES', data)
-      // console.log('SUCCESS 2', CPM)
+      // var cpmLabels = [] // labels of CPM edges
+      console.log('SUCCES', data)
+      JSON.stringify(data)
+      for(var i = 0; i < data.length; i++){
+          if(data[i].from != data[i].to){
+            console.log("dodaje wartosc")
+            console.log(data[i].label)
+            console.log(typeof(data[i].label))
+            cpmLabels.push(String(data[i].label))
+            // cpmLabels[i] = String(data[i].label)
+            console.log(typeof(cpmLabels[i]))
+          }
+      }
+      console.log('SUCCESS 2')
+      console.log(cpmLabels)
+      // this.graph = this.state.graph
+      // this.state.graph = this.convertNodes(this.state.graph,cpmLabels)
+      
     })
     .catch((error) => {
       console.error('Error:', error);
     });
 
-    
-
+    this.state.graph = this.convertNodes(this.state.graph)
     this.setState({editor: !this.state.editor})
 
   }
