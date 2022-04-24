@@ -15,7 +15,7 @@ async function fetchGraph(graph) {
     body: JSON.stringify(graph)
   })
   console.log("send")
-  return await response.json()
+  //return await response.json()
 
   return {
     nodes: [

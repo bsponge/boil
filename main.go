@@ -16,24 +16,26 @@ import (
 // "github.com/bsponge/boil/event"
 
 func main() {
-	// fmt.Println("test")
-	// g := graph.New(6)
+	/*
+		fmt.Println("test")
+		g := graph.New(6)
 
-	// g.AddEdge(0, 1, 5, "A")
-	// g.AddEdge(0, 2, 7, "B")
-	// g.AddEdge(1, 3, 6, "C")
-	// g.AddEdge(1, 4, 8, "D")
-	// g.AddEdge(2, 4, 3, "E")
-	// g.AddEdge(3, 4, 4, "F")
-	// g.AddEdge(3, 5, 2, "G")
-	// g.AddEdge(4, 5, 5, "H")
+		g.AddEdge(0, 1, 5, "A")
+		g.AddEdge(0, 2, 7, "B")
+		g.AddEdge(1, 3, 6, "C")
+		g.AddEdge(1, 4, 8, "D")
+		g.AddEdge(2, 4, 3, "E")
+		g.AddEdge(3, 4, 4, "F")
+		g.AddEdge(3, 5, 2, "G")
+		g.AddEdge(4, 5, 5, "H")
 
-	// path := g.CPM()
+		path := g.CPM()
 
-	// fmt.Println(g.String())
+		fmt.Println(g.String())
 
-	// fmt.Println(path)
-	// fmt.Println(g.CPM())
+		fmt.Println(path)
+		fmt.Println(g.CPM())
+	*/
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -53,7 +55,9 @@ func main() {
 				g.AddEdge(action.Source, action.Destination, action.Duration, action.Label)
 			}
 			fmt.Println(actions)
-			g.CPM()
+			cpm := g.CPM()
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(cpm)
 		}
 	})
 
