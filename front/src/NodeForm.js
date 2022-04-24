@@ -12,6 +12,8 @@ class NodeForm extends React.Component {
         this.setDuration = this.setDuration.bind(this)
         this.clearState = this.clearState.bind(this)
         this.submit = this.submit.bind(this)
+
+        this.nodes = []
     }
 
     setAction(event) {
@@ -46,11 +48,15 @@ class NodeForm extends React.Component {
         event.preventDefault()
         var node = {
             action: this.state.action,
-            precedingActions: [],
+            // precedingActions: [],
+            source: this.state.source,
+            destination: this.state.destination,
             duration: this.state.duration
         }
-        console.log(this.state.precedingActions)
+
         this.props.func(node)
+        // this.nodes.push(node)
+        // console.log("nodes"+this.nodes)
         this.clearState()
     }
 

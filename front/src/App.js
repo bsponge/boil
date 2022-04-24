@@ -4,34 +4,34 @@ import React, { useCallback } from 'react';
 import TableData from './TableData'
 
 async function fetchGraph(graph) {
-	/*
+
   const response = await fetch('http://localhost:8080/', {
     method: "POST",
     headers: {
-      'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': '*'
     },
     body: JSON.stringify(graph)
   })
+  console.log("send")
   return await response.json()
-  */
-	return {
-		nodes: [
-			{ id: "A", label: "Node 1", title: "node 1 tooltip text" },
-			{ id: "B", label: "Node 2", title: "node 2 tooltip text" },
-			{ id: "C", label: "Node 3", title: "node 3 tooltip text" },
-			{ id: "D", label: "Node 4", title: "node 4 tooltip text" },
-			{ id: "E", label: "Node 5", title: "node 5 tooltip text" },
-		],
-		edges: [
-			{ from: "A", to: "B"},
-			{ from: "A", to: "C" },
-			{ from: "B", to: "D" },
-			{ from: "B", to: "E" },
-		]
-	}
+
+  return {
+    nodes: [
+      // { id: "A", label: "Node 1", title: "node 1 tooltip text" },
+      // { id: "B", label: "Node 2", title: "node 2 tooltip text" },
+      // { id: "C", label: "Node 3", title: "node 3 tooltip text" },
+      // { id: "D", label: "Node 4", title: "node 4 tooltip text" },
+      // { id: "E", label: "Node 5", title: "node 5 tooltip text" },
+    ],
+    edges: [
+      { from: "A", to: "B"},
+      { from: "A", to: "C" },
+      { from: "B", to: "D" },
+      { from: "B", to: "E" },
+    ]
+  }
 }
 
 function Face(props) {
@@ -59,17 +59,17 @@ class App extends React.Component {
       editor: true,
       graph: {
         nodes: [
-          { id: "A", label: "Node 1", title: "node 1 tooltip text" },
-          { id: "B", label: "Node 2", title: "node 2 tooltip text" },
-          { id: "C", label: "Node 3", title: "node 3 tooltip text" },
-          { id: "D", label: "Node 4", title: "node 4 tooltip text" },
-          { id: "E", label: "Node 5", title: "node 5 tooltip text" },
+          // { id: "A", label: "Node 1", title: "node 1 tooltip text" },
+          // { id: "B", label: "Node 2", title: "node 2 tooltip text" },
+          // { id: "C", label: "Node 3", title: "node 3 tooltip text" },
+          // { id: "D", label: "Node 4", title: "node 4 tooltip text" },
+          // { id: "E", label: "Node 5", title: "node 5 tooltip text" },
         ],
         edges: [
-          { from: "A", to: "B", label: "JFKDSLFDS", color: "red" },
-          { from: "A", to: "C" },
-          { from: "B", to: "D" },
-          { from: "B", to: "E" },
+          // { from: "A", to: "B", label: "JFKDSLFDS", color: "red" },
+          // { from: "A", to: "C" },
+          // { from: "B", to: "D" },
+          // { from: "B", to: "E" },
         ]
       }
     }
@@ -78,8 +78,46 @@ class App extends React.Component {
     this.updateGraph = this.updateGraph.bind(this)
   }
 
+  // convert nodes to graph
+  // convertNodes(nodesArray){
+  //   this.graph = {
+  //     edges: [],
+  //     nodes:[
+  //       {id: "a", label:"a"}
+  //     ]
+  //   }
+
+  //   var nodeList = []
+  //   for(var i = 1; i < nodesArray.length; i++){
+  //     if(!nodeList.includes(nodesArray[i].destination)){
+  //       nodeList.push(nodesArray[i].destination)
+  //       var node = { id: nodesArray[i].destination, label: nodesArray[i].destination}
+  //       this.graph.nodes.push(node)
+  //     }
+  //   }
+
+  //   for(var i = 1; i < nodesArray.length; i++){
+  //     var edge = { from: nodesArray[i].source, to: nodesArray[i].destination, label: nodesArray[i].action+nodesArray[i].duration}
+  //     this.graph.edges.push(edge)
+  //   }
+
+  //   console.log("CREATED NEW LIST")
+  //   console.log(this.graph)
+
+  //   return this.graph
+  // }
+
   edit(event) {
+    // console.log(this.state.graph)
+    // this.state.graph = this.convertNodes(this.state.graph)
+    this.state.graph = fetchGraph(this.state.graph)
     this.setState({editor: !this.state.editor})
+  }
+
+
+  send(graph){
+    // this.setState({editor: !this.state.editor})
+    // fetchGraph(graph)
   }
 
   updateGraph(graph) {
@@ -89,6 +127,7 @@ class App extends React.Component {
     prev.graph = graph
     this.setState(prev)
   }
+
 
   render() {
     const options = {
