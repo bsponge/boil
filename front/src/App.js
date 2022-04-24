@@ -78,47 +78,88 @@ class App extends React.Component {
     this.updateGraph = this.updateGraph.bind(this)
   }
 
-  // convert nodes to graph
-  // convertNodes(nodesArray){
-  //   this.graph = {
-  //     edges: [],
-  //     nodes:[
-  //       {id: "a", label:"a"}
-  //     ]
+  // convert activities to graph
+  convertNodes(activityArray){
+    this.graph = {
+      edges: [],
+      nodes:[]
+    }
+
+    // add nodes to graph
+    var nodeList = []
+    for(var i = 0; i < activityArray.length; i++){
+      if(!nodeList.includes(activityArray[i].destination)){
+        nodeList.push(activityArray[i].destination)
+        var node = { id: activityArray[i].destination, label: activityArray[i].destination}
+        this.graph.nodes.push(node)
+      }
+      
+      if(!nodeList.includes(activityArray[i].source)){
+        nodeList.push(activityArray[i].source)
+        var node = { id: activityArray[i].source, label: activityArray[i].source}
+        this.graph.nodes.push(node)
+      }
+    }
+
+    for(var i = 0; i < activityArray.length; i++){
+      var edge = { from: activityArray[i].source, to: activityArray[i].destination, label: activityArray[i].action+activityArray[i].duration}
+      this.graph.edges.push(edge)
+    }
+
+
+    return this.graph
+  }
+  
+  // getResponse(url, callback){
+  //   var request = new XMLHttpRequest()
+  //   request.onreadystatechange = function(){
+  //     if(request.readyState = 4 && request.status = 200)
+  //       callback(request.responseText)
   //   }
-
-  //   var nodeList = []
-  //   for(var i = 1; i < nodesArray.length; i++){
-  //     if(!nodeList.includes(nodesArray[i].destination)){
-  //       nodeList.push(nodesArray[i].destination)
-  //       var node = { id: nodesArray[i].destination, label: nodesArray[i].destination}
-  //       this.graph.nodes.push(node)
-  //     }
-  //   }
-
-  //   for(var i = 1; i < nodesArray.length; i++){
-  //     var edge = { from: nodesArray[i].source, to: nodesArray[i].destination, label: nodesArray[i].action+nodesArray[i].duration}
-  //     this.graph.edges.push(edge)
-  //   }
-
-  //   console.log("CREATED NEW LIST")
-  //   console.log(this.graph)
-
-  //   return this.graph
   // }
 
+  // function to paint CPM red
+  paintCPM(data, edges){
+    var parsedData = JSON.parse(data)
+    for(var i = 0; i < edges.length; i++){
+      var strCheck = Array.from(edges[i].label)
+      if(parsedData[i].action == strCheck[0]){
+        console.log("IM HERE!")
+        edges[i].color = "red"
+      }
+    }
+  }
+
   edit(event) {
-    // console.log(this.state.graph)
-    // this.state.graph = this.convertNodes(this.state.graph)
-    this.state.graph = fetchGraph(this.state.graph)
+    
+    const data = JSON.stringify(this.state.graph) // save data to post
+    console.log("SENDING: "+data)
+    this.state.graph = this.convertNodes(this.state.graph)
+    
+
+    // get CPM from server alghoritm
+    fetch('http://localhost:8080/',{
+      method: 'POST',
+      headers:{
+        'Content-Type': 'application/json',
+      },
+      body: data
+    })
+    .then((response)=>response.json())
+    .then((data)=>{
+      var CPM = data
+      console.log('SUCCES!!!', data)
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
+    this.paintCPM(data, this.state.graph.edges)
+
     this.setState({editor: !this.state.editor})
+
   }
 
-
-  send(graph){
-    // this.setState({editor: !this.state.editor})
-    // fetchGraph(graph)
-  }
 
   updateGraph(graph) {
     console.log("UPDATING GRAPH")

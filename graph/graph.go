@@ -243,7 +243,7 @@ func (g *Graph) cpm(idx uint) []Response {
 	for node := g.AdjacencyList[idx].Node; node != nil; node = node.Next {
 		if node.Value.Reserve == 0 {
 			//s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
-			r = append(r, Response{node.Value.Source, node.Value.Destination})
+			r = append(r, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
 			//s += g.cpm(node.Value.Destination)
 			r = append(r, g.cpm(node.Value.Destination)...)
 
@@ -253,8 +253,9 @@ func (g *Graph) cpm(idx uint) []Response {
 }
 
 type Response struct {
-	From uint `json:"from"`
-	To   uint `json:"to"`
+	From  uint   `json:"from"`
+	To    uint   `json:"to"`
+	Label string `json:"label"`
 }
 
 func (g *Graph) CPM() []Response {
@@ -265,7 +266,7 @@ func (g *Graph) CPM() []Response {
 
 	for node := g.AdjacencyList[0].Node; node != nil; node = node.Next {
 		if node.Value.Reserve == 0 {
-			cpm = append(cpm, Response{node.Value.Source, node.Value.Destination})
+			cpm = append(cpm, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
 			//cpm += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
 			cpm = append(cpm, g.cpm(node.Value.Destination)...)
 		}
