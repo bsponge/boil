@@ -110,24 +110,25 @@ class App extends React.Component {
     return this.graph
   }
   
-  // getResponse(url, callback){
-  //   var request = new XMLHttpRequest()
-  //   request.onreadystatechange = function(){
-  //     if(request.readyState = 4 && request.status = 200)
-  //       callback(request.responseText)
-  //   }
-  // }
 
   // function to paint CPM red
   paintCPM(data, edges){
     var parsedData = JSON.parse(data)
-    for(var i = 0; i < edges.length; i++){
-      var strCheck = Array.from(edges[i].label)
-      if(parsedData[i].action == strCheck[0]){
-        console.log("IM HERE!")
-        edges[i].color = "red"
-      }
-    }
+    console.log("CPM PAINTING")
+    console.log(parsedData)
+    // for(var i = 0; i < edges.length; i++){
+    //   var strCheck = Array.from(edges[i].label)
+    //   for(var j = 0; j < data.length; j++){
+    //     console.log("INSIDE LOOP")
+    //     console.log("strcheck = ", strCheck[0])
+    //     console.log("data.action = ", parsedData[j].action)
+    //       if(parsedData[j].action == strCheck[0]){
+    //         console.log("IM HERE!")
+    //         edges[i].color = "red"
+    //     }
+    //   }
+      
+    // }
   }
 
   edit(event) {
@@ -147,14 +148,16 @@ class App extends React.Component {
     })
     .then((response)=>response.json())
     .then((data)=>{
-      var CPM = data
-      console.log('SUCCES!!!', data)
+      // var CPM = data
+      this.paintCPM(data, this.state.graph.edges)
+      // console.log('SUCCES', data)
+      // console.log('SUCCESS 2', CPM)
     })
     .catch((error) => {
       console.error('Error:', error);
     });
 
-    this.paintCPM(data, this.state.graph.edges)
+    
 
     this.setState({editor: !this.state.editor})
 

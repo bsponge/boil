@@ -1,15 +1,15 @@
 package main
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	"fmt"
-	// "log"
-	// "net/http"
-	// "strconv"
+	"log"
+	"net/http"
+	"strconv"
 
-	// "github.com/bsponge/boil/event"
+	"github.com/bsponge/boil/event"
 	"github.com/bsponge/boil/graph"
-	// "github.com/bsponge/boil/types"
+	"github.com/bsponge/boil/types"
 )
 
 // "net/http"
@@ -19,85 +19,90 @@ import (
 
 func main() {
 
-	fmt.Println("test")
-	g := graph.New(6)
+	// fmt.Println("test")
+	// g := graph.New(4)
 
-	g.AddEdge(0, 1, 5, "A")
-	g.AddEdge(0, 2, 7, "B")
-	g.AddEdge(1, 3, 6, "C")
-	g.AddEdge(1, 4, 8, "D")
-	g.AddEdge(2, 4, 3, "E")
-	g.AddEdge(3, 4, 4, "F")
-	g.AddEdge(3, 5, 2, "G")
-	g.AddEdge(4, 5, 5, "H")
+	// g.AddEdge(0, 1, 5, "A")
+	// g.AddEdge(0, 2, 7, "B")
+	// g.AddEdge(1, 3, 6, "C")
+	// g.AddEdge(1, 4, 8, "D")
+	// g.AddEdge(2, 4, 3, "E")
+	// g.AddEdge(3, 4, 4, "F")
+	// g.AddEdge(3, 5, 2, "G")
+	// g.AddEdge(4, 5, 5, "H")
 
-	path := g.CPM()
+	// g.AddEdge(0, 1, 1, "A")
+	// g.AddEdge(0, 2, 1, "B")
+	// g.AddEdge(1, 3, 4, "C")
+	// g.AddEdge(2, 3, 1, "D")
 
-	fmt.Println(g.String())
+	// path := g.CPM()
 
-	fmt.Println(path)
-	fmt.Println(g.CPM())
+	// fmt.Println(g.String())
 
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	// 	w.Header().Set("Access-Control-Allow-Headers", "*")
+	// fmt.Println(path)
+	// fmt.Println(g.CPM())
 
-	// 	if r.Method == "POST" {
-	// 		// actions := []event.Nodes{}
-	// 		parser := []event.Parser{}
-	// 		fmt.Println("got!")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
 
-	// 		// err := json.NewDecoder(r.Body).Decode(&actions)
-	// 		err := json.NewDecoder(r.Body).Decode(&parser)
-	// 		if err != nil {
-	// 			log.Println(err)
-	// 			return
-	// 		}
+		if r.Method == "POST" {
+			// actions := []event.Nodes{}
+			parser := []event.Parser{}
+			fmt.Println("got!")
 
-	// 		// fmt.Println(actions[0])
-	// 		// fmt.Println(actions[1])
+			// err := json.NewDecoder(r.Body).Decode(&actions)
+			err := json.NewDecoder(r.Body).Decode(&parser)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 
-	// 		fmt.Println("printing info:")
-	// 		// fmt.Println(actions)
-	// 		g := graph.New(100)
-	// 		// g := graph.New(2)
-	// 		// println(g)
+			// fmt.Println(actions[0])
+			// fmt.Println(actions[1])
 
-	// 		println("PARSER TEST:  ", parser[0].Destination, " label = ", parser[0].Action)
-	// 		println("PARSER TEST:  ", parser[1].Destination, " label = ", parser[1].Action)
-	// 		// fmt.Println("actions len:", len(actions))
-	// 		for _, pr := range parser {
-	// 			// fmt.Println("loooop: source ", action.Source, " dest: ", action.Destination, " time: ", action.Duration, " l = ", action.Label)
-	// 			source, err := strconv.ParseUint(pr.Source, 10, 32)
-	// 			println("parsed: source = ", source)
-	// 			destination, err1 := strconv.ParseUint(pr.Destination, 10, 32)
+			fmt.Println("printing info:")
+			// fmt.Println(actions)
+			g := graph.New(len(parser))
+			// g := graph.New(2)
+			// println(g)
 
-	// 			println("parsed: dest = ", destination)
+			println("PARSER TEST:  ", parser[0].Destination, " label = ", parser[0].Action)
+			println("PARSER TEST:  ", parser[1].Destination, " label = ", parser[1].Action)
+			// fmt.Println("actions len:", len(actions))
+			for _, pr := range parser {
+				// fmt.Println("loooop: source ", action.Source, " dest: ", action.Destination, " time: ", action.Duration, " l = ", action.Label)
+				source, err := strconv.ParseUint(pr.Source, 10, 32)
+				println("parsed: source = ", source)
+				destination, err1 := strconv.ParseUint(pr.Destination, 10, 32)
 
-	// 			duration, err2 := strconv.ParseUint(pr.Duration, 10, 32)
-	// 			// println("parsed: cost = ", duration)
+				println("parsed: dest = ", destination)
 
-	// 			println("in loop: parser label = ", pr.Action)
-	// 			// g.AddEdge(action.Source, action.Destination, action.Duration, action.Label)
-	// 			if err != nil && err1 != nil && err2 != nil {
-	// 				fmt.Println("Error caught!")
-	// 			} else {
-	// 				println("adding: ", source, destination, pr.Action)
-	// 				g.AddEdge(uint(source), uint(destination), types.Cost(duration), pr.Action)
-	// 			}
+				duration, err2 := strconv.ParseUint(pr.Duration, 10, 32)
+				// println("parsed: cost = ", duration)
 
-	// 		}
+				println("in loop: parser label = ", pr.Action)
+				// g.AddEdge(action.Source, action.Destination, action.Duration, action.Label)
+				if err != nil && err1 != nil && err2 != nil {
+					fmt.Println("Error caught!")
+				} else {
+					println("adding: ", source, destination, pr.Action)
+					g.AddEdge(uint(source), uint(destination), types.Cost(duration), pr.Action)
+				}
 
-	// 		cpm := g.CPM()
-	// 		fmt.Print(cpm)
-	// 		w.Header().Set("Content-Type", "application/json")
-	// 		json.NewEncoder(w).Encode(cpm)
-	// 	}
-	// })
+			}
 
-	// err := http.ListenAndServe(":8080", nil)
-	// if err != nil {
-	// 	log.Fatal("HTTP server error", err)
-	// 	return
-	// }
+			cpm := g.CPM()
+			fmt.Print(cpm)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(cpm)
+		}
+	})
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("HTTP server error", err)
+		return
+	}
 }
