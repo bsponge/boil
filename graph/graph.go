@@ -24,12 +24,13 @@ type Edge struct {
 type Graph struct {
 	AdjacencyList []linkedlist.LinkedList[Edge]
 	Preceding     []linkedlist.LinkedList[Edge]
+	Biggest       uint
 }
 
 func New(size int) *Graph {
 	return &Graph{
 		AdjacencyList: make([]linkedlist.LinkedList[Edge], size+1),
-		Preceding:     make([]linkedlist.LinkedList[Edge], size+1),
+		Preceding:     make([]linkedlist.LinkedList[Edge], size+2),
 	}
 }
 
@@ -42,6 +43,10 @@ func (g *Graph) AddEdge(source, destination uint, cost types.Cost, label string)
 	}
 
 	g.AdjacencyList[source].AddNode(edge)
+
+	if g.Biggest < destination {
+		g.Biggest = destination
+	}
 }
 
 func (g *Graph) findNode(label string) (uint, error) {
@@ -160,9 +165,7 @@ func (g *Graph) StepForward() error {
 				EarliestFinish: node.Value.EarliestFinish,
 				LatestFinish:   types.Cost(99999999),
 			}
-			if int(node.Value.Destination) < len(g.Preceding) {
-				g.Preceding[node.Value.Destination].AddNode(edge)
-			}
+			g.Preceding[node.Value.Destination].AddNode(edge)
 		}
 	}
 

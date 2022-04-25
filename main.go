@@ -37,7 +37,6 @@ func main() {
 	fmt.Println(g.String())
 
 	fmt.Println(path)
-	fmt.Println(g.CPM())
 
 	/*
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
