@@ -28,8 +28,8 @@ type Graph struct {
 
 func New(size int) *Graph {
 	return &Graph{
-		AdjacencyList: make([]linkedlist.LinkedList[Edge], size),
-		Preceding:     make([]linkedlist.LinkedList[Edge], size),
+		AdjacencyList: make([]linkedlist.LinkedList[Edge], size+1),
+		Preceding:     make([]linkedlist.LinkedList[Edge], size+1),
 	}
 }
 
@@ -160,7 +160,9 @@ func (g *Graph) StepForward() error {
 				EarliestFinish: node.Value.EarliestFinish,
 				LatestFinish:   types.Cost(99999999),
 			}
-			g.Preceding[node.Value.Destination].AddNode(edge)
+			if int(node.Value.Destination) < len(g.Preceding) {
+				g.Preceding[node.Value.Destination].AddNode(edge)
+			}
 		}
 	}
 
@@ -168,16 +170,18 @@ func (g *Graph) StepForward() error {
 }
 
 func (g *Graph) stepForward(startValue types.Cost, idx uint) error {
-	list := g.AdjacencyList[idx]
-	for node := list.Node; node != nil; node = node.Next {
-		if node.Value.EarliestStart <= startValue {
-			node.Value.EarliestStart = startValue
-			node.Value.EarliestFinish = node.Value.EarliestStart + node.Value.Cost
-		}
+	if int(idx) < len(g.AdjacencyList) {
+		list := g.AdjacencyList[idx]
+		for node := list.Node; node != nil; node = node.Next {
+			if node.Value.EarliestStart <= startValue {
+				node.Value.EarliestStart = startValue
+				node.Value.EarliestFinish = node.Value.EarliestStart + node.Value.Cost
+			}
 
-		err := g.stepForward(node.Value.EarliestFinish, node.Value.Destination)
-		if err != nil {
-			return err
+			err := g.stepForward(node.Value.EarliestFinish, node.Value.Destination)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -240,15 +244,18 @@ func (g *Graph) cpy() {
 
 func (g *Graph) cpm(idx uint) []Response {
 	r := make([]Response, 1)
-	for node := g.AdjacencyList[idx].Node; node != nil; node = node.Next {
-		if node.Value.Reserve == 0 {
-			//s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
-			r = append(r, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
-			//s += g.cpm(node.Value.Destination)
-			r = append(r, g.cpm(node.Value.Destination)...)
+	if int(idx) < len(g.AdjacencyList) {
+		for node := g.AdjacencyList[idx].Node; node != nil; node = node.Next {
+			if node.Value.Reserve == 0 {
+				//s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
+				r = append(r, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
+				//s += g.cpm(node.Value.Destination)
+				r = append(r, g.cpm(node.Value.Destination)...)
 
+			}
 		}
 	}
+
 	return r
 }
 
