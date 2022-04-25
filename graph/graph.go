@@ -249,13 +249,14 @@ func (g *Graph) cpm(idx uint) []Response {
 	r := make([]Response, 1)
 	if int(idx) < len(g.AdjacencyList) {
 		for node := g.AdjacencyList[idx].Node; node != nil; node = node.Next {
-			if node.Value.Reserve == 0 {
-				//s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
-				r = append(r, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
-				//s += g.cpm(node.Value.Destination)
-				r = append(r, g.cpm(node.Value.Destination)...)
+			// if node.Value.Reserve == 0 {
+			//s += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
+			r = append(r, Response{node.Value.Source, node.Value.Destination, node.Value.Label, uint(node.Value.EarliestStart),
+				uint(node.Value.EarliestFinish), uint(node.Value.LatestStart), uint(node.Value.LatestFinish), uint(node.Value.Reserve), uint(node.Value.Cost)})
+			//s += g.cpm(node.Value.Destination)
+			r = append(r, g.cpm(node.Value.Destination)...)
 
-			}
+			// }
 		}
 	}
 
@@ -263,9 +264,15 @@ func (g *Graph) cpm(idx uint) []Response {
 }
 
 type Response struct {
-	From  uint   `json:"from"`
-	To    uint   `json:"to"`
-	Label string `json:"label"`
+	From           uint   `json:"from"`
+	To             uint   `json:"to"`
+	Label          string `json:"label"`
+	EarliestStart  uint   `json:"es"`
+	EarliestFinish uint   `json:"ef"`
+	LatestStart    uint   `json:"ls"`
+	LatestFinish   uint   `json:"lf"`
+	Reserve        uint   `json:"reserve"`
+	Duration       uint   `json:"duration"`
 }
 
 func (g *Graph) CPM() []Response {
@@ -275,11 +282,12 @@ func (g *Graph) CPM() []Response {
 	cpm := make([]Response, 1)
 
 	for node := g.AdjacencyList[0].Node; node != nil; node = node.Next {
-		if node.Value.Reserve == 0 {
-			cpm = append(cpm, Response{node.Value.Source, node.Value.Destination, node.Value.Label})
-			//cpm += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
-			cpm = append(cpm, g.cpm(node.Value.Destination)...)
-		}
+		// if node.Value.Reserve == 0 {
+		cpm = append(cpm, Response{node.Value.Source, node.Value.Destination, node.Value.Label, uint(node.Value.EarliestStart),
+			uint(node.Value.EarliestFinish), uint(node.Value.LatestStart), uint(node.Value.LatestFinish), uint(node.Value.Reserve), uint(node.Value.Cost)})
+		//cpm += fmt.Sprintf("[from: %d, to: %d] -> ", node.Value.Source, node.Value.Destination)
+		cpm = append(cpm, g.cpm(node.Value.Destination)...)
+		// }
 	}
 	return cpm
 }

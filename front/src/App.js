@@ -2,6 +2,7 @@ import Graph from 'react-graph-vis';
 import './App.css';
 import React, { useCallback } from 'react';
 import TableData from './TableData'
+import { Text, StyleSheet } from 'react-native';
 
 async function fetchGraph(graph) {
 
@@ -34,24 +35,61 @@ async function fetchGraph(graph) {
 	}
 }
 
+const styles = StyleSheet.create({
+  baseText: {
+    fontWeight: 'bold'
+  },
+  innerText: {
+    color: 'black'
+  },
+  CPM: {
+    fontWeight: 'bold',
+    color: 'red'
+  }
+});
+
+var cpmLabels = []
+
+var time = 0
+
 function Face(props) {
 	if (props.isEditor) {
 		return <TableData
 		graph={props.graph}
+    text={props.text}
 		updateCallback={props.updateCallback}
 			/>
 	} else {
 		//const response = fetchGraph(props.graph)
-		return <Graph
+		return [<Graph
 		graph={props.graph}
 		options={props.options}
 		events={props.events}
 		style={{ height: "800px" }}
-			/>
+			/>,
+
+      <Text style={styles.baseText}>
+      Legenda
+      <br></br>
+      <Text style={styles.innerText}> Nazwa przy czynności: "A5" oznacza czynność oraz czas trwania</Text>
+      <br></br>
+      <Text style={styles.innerText}> Pierwszy nawias: "[0 ; 5]" oznacza najwcześniejszy start oraz koniec czynności</Text>
+      <br></br>
+      <Text style={styles.innerText}> Drugi nawias : "[5 ; 12]" oznacza najpóźniejszy start oraz koniec czynności</Text>
+      <br></br>
+      <Text style={styles.baseText}>ŚCIEŻKA KRYTYCZNA: </Text>
+      <Text style={styles.CPM}>  {cpmLabels}</Text>
+      <br></br>
+      <Text style={styles.baseText}>CZAS REALIZACJI: </Text>
+      <Text style={styles.CPM}>  {time}</Text>
+    </Text>
+    ]
+      
 	}
+  
 }
 
-var cpmLabels = []
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -109,10 +147,8 @@ class App extends React.Component {
 
 		for(var i = 0; i < cpmLabels.length; i++) console.log( cpmLabels[i])
 		for(var i = 0; i < activityArray.length; i++){
-			var col
-			var checker = String(activityArray[i].action)
 
-			var edge = { from: activityArray[i].source, to: activityArray[i].destination, label: activityArray[i].action+activityArray[i].duration, color: activityArray[i].color}
+			var edge = { from: activityArray[i].source, to: activityArray[i].destination, label: activityArray[i].action, color: activityArray[i].color}
 			graph.edges.push(edge)
 		}
 
@@ -129,9 +165,7 @@ class App extends React.Component {
 
 		JSON.stringify(data)
 		console.log("SENDING: "+data)
-		// this.state.graph = this.convertNodes(this.state.graph)
 
-		// const cpmLabels = [] // labels of CPM edges
 		// get CPM from server alghoritm
 		fetch('http://localhost:8080/',{
 			method: 'POST',
@@ -147,18 +181,26 @@ class App extends React.Component {
 				JSON.stringify(data)
 				for(var i = 0; i < data.length; i++){
 					if(data[i].from != data[i].to){
-						cpmLabels.push(String(data[i].label))
 						for (var j = 0; j < this.state.graph.length; j++) {
 							if (this.state.graph[j].action == data[i].label) {
-								this.state.graph[j].color = "red"
+                var lab = data[i].label
+                this.state.graph[j].action = lab.concat(data[i].duration,"\n", "[", data[i].es, " ; ",  data[i].ef,"]",
+                "\n", "[", data[i].ls, " ; ",  data[i].lf, "]")
+                if(data[i].reserve == 0){
+								  this.state.graph[j].color = "red"
+                  cpmLabels.push(data[i].label)
+                  cpmLabels.push(" -> ")
+                  time += parseInt(data[i].duration)
+                }
 								console.log("JEST")
 							}
 						}
 					}
 				}
 
+        cpmLabels.pop() // delete last arrow
 				this.state.graph = this.convertNodes(this.state.graph)
-
+        
 				this.setState({editor: !this.state.editor})
 				console.log("RECEIVED CPM DATA")
 			})
