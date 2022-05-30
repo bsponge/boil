@@ -31,8 +31,12 @@ class TableRoute extends React.Component {
         }
 
         this.onEdit = this.onEdit.bind(this)
-        this.prepare = this.prepare.bind(this)
+        this.prepareDemands = this.prepareDemands.bind(this)
+        this.prepareCosts = this.prepareCosts.bind(this)
         this.onCostChange = this.onCostChange.bind(this)
+        this.onDemandChange = this.onDemandChange.bind(this)
+        this.onSupplyChange = this.onSupplyChange.bind(this)
+        this.submit = this.submit.bind(this)
     }
 
     onEdit(event) {
@@ -47,15 +51,41 @@ class TableRoute extends React.Component {
         } catch (error) {}
     }
 
-    prepare() {
+    onDemandChange(event, id) {
+        let prev = {...this.state}
+        try {
+            prev.consumers[id].demand = parseInt(event.target.value)
+            this.setState(prev)
+        } catch (error) {}
+    }
+
+    onSupplyChange(event, id) {
+        let prev = { ...this.state }
+        try {
+            prev.providers[id].supply = parseInt(event.target.value)
+            this.setState(prev)
+        } catch (error) { }
+    }
+
+    prepareCosts() {
         let components = []
 
         for (let i = 0; i < this.state.routes.length; i++) {
-            let tds = [<td>{this.state.providers[i].name}</td>, <td><input value={this.state.providers[i].supply}/></td>]
+            let tds = [<td>{this.state.providers[i].name}</td>, <td><input id={i} onChange={event => this.onSupplyChange(event, i)} value={this.state.providers[i].supply}/></td>]
             for (let j = 0; j < this.state.routes[i].length; j++) {
                 tds.push(<td><input row={i} column={j} onChange={event => this.onCostChange(event, i, j)} value={this.state.routes[i][j].costOfTransport}/></td>)
             }
             components.push(<tr>{tds}</tr>)
+        }
+
+        return components
+    }
+
+    prepareDemands() {
+        let components = []
+
+        for (let i = 0; i < this.state.consumers.length; i++) {
+            components.push(<td><input id={i} onChange={event => this.onDemandChange(event, i)} value={this.state.consumers[i].demand}/></td>)
         }
 
         return components
@@ -84,13 +114,9 @@ class TableRoute extends React.Component {
                         <tr>
                             <td/>
                             <td/>
-                            {this.props.consumers.map(consumer => {
-                                return (
-                                    <td><input value={consumer.demand}/></td>
-                                )
-                            })}
+                            {this.prepareDemands()}
                         </tr>
-                        {this.prepare()}
+                        {this.prepareCosts()}
                     </tbody>
                 </table>
                 <button class="formButton" onClick={this.submit}>Submit</button><br />
