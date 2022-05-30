@@ -46,7 +46,6 @@ class ConsumerForm extends React.Component {
         )
         console.log(consumer)
         this.clearState()
-        this.handleChange(event)
         this.props.onConsumersChange(this.state)
     }
 

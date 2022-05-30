@@ -1,5 +1,5 @@
 class Consumer {
-  constructor(name='', column=0, demand=0, demandLeft=0, sellingPrice=0) {
+  constructor(name, column=0, demand=0, demandLeft=0, sellingPrice=0) {
     this.name = name
     this.column = column
     this.demand = demand
