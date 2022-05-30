@@ -27,19 +27,30 @@ class Face extends React.Component {
     }
 
     setConsumer(consumer) {
-        var prev = {...this.state}
+        var prev = { ...this.state }
         prev.consumers.push(consumer)
         this.setState(prev)
     }
 
     setProvider(provider) {
-        var prev = {...this.state}
+        var prev = { ...this.state }
         prev.providers.push(provider)
         this.setState(prev)
     }
 
     submit(state) {
+        console.log(state)
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ consumers: state.consumers, providers: state.providers })
+        }
 
+        console.log({ consumers: state.consumers, providers: state.providers })
+
+        const request = fetch('http://localhost:8080/broker/calc', requestOptions)
+            .then(response => response.json())
+            .then(data => console.log(data))
     }
 
     render() {
