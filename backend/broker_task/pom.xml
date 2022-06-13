@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>pl.edu.agh.boil.project2</groupId>
 	<artifactId>broker_task</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>broker_task</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>

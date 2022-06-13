@@ -113,11 +113,11 @@ public class BrokerMethod {
 					column = j;
 				}
 			}
-			//System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
+//			System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
 			if(row < 0 || column < 0)
 				break;
 
-			//System.out.println(row+" "+column+" = "+routes[row][column].getProfit());
+//			System.out.println(row+" "+column+" = "+routes[row][column].getProfit());
 			
 			double toTake;
 			if(providers[row].getSupplyLeft() < customers[column].getDemandLeft()) {
@@ -126,9 +126,9 @@ public class BrokerMethod {
 				toTake = customers[column].getDemandLeft();
 			}
 			providers[row].setSupplyLeft(providers[row].getSupplyLeft() - toTake);
-			customers[column].setDemandLeft(customers[column].getDemand() - toTake);
+			customers[column].setDemandLeft(customers[column].getDemandLeft() - toTake);
 			routes[row][column].setAmountOfGoods(routes[row][column].getAmountOfGoods() + toTake);
-//			//System.out.println(row+" "+column+": "+routes[row][column].getAmountOfGoods()+"\t"+providers[row].getSupplyLeft()+"\t"+customers[column].getDemandLeft());
+//			System.out.println(row+" "+column+": "+routes[row][column].getAmountOfGoods()+"\t"+providers[row].getSupplyLeft()+"\t"+customers[column].getDemandLeft());
 			
 		}
 	}
