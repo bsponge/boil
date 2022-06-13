@@ -64,20 +64,20 @@ public class BrokerMethod {
 	private void prepare() {
 		
 		for(int i = 0; i < customers.length; ++i) {
-			System.out.print(customers[i].getName()+":"+customers[i].getDemand()+":"+customers[i].getDemandLeft()+":"+customers[i].getSellingPrice()+"\t");
+			//System.out.print(customers[i].getName()+":"+customers[i].getDemand()+":"+customers[i].getDemandLeft()+":"+customers[i].getSellingPrice()+"\t");
 		}
-		System.out.println();
-		System.out.println();
+		//System.out.println();
+		//System.out.println();
 		for(int i = 0; i < providers.length; ++i) {
-			System.out.print(providers[i].getName()+":"+providers[i].getSupply()+":"+providers[i].getSupplyLeft()+":"+providers[i].getCostOfPurchase()+"\t");
+			//System.out.print(providers[i].getName()+":"+providers[i].getSupply()+":"+providers[i].getSupplyLeft()+":"+providers[i].getCostOfPurchase()+"\t");
 		}
-		System.out.println();
-		System.out.println();
+		//System.out.println();
+		//System.out.println();
 		for(int i = 0; i < routes.length; ++i) {
 			for(int j = 0; j < routes[i].length; ++j) {
-				System.out.print(routes[i][j].getCostOfTransport()+"\t");
+				//System.out.print(routes[i][j].getCostOfTransport()+"\t");
 			}
-			System.out.println();
+			//System.out.println();
 		}
 		
 		
@@ -86,11 +86,11 @@ public class BrokerMethod {
 			for(int j = 0; j < (routes[i].length-1); ++j) {
 				double profit = customers[j].getSellingPrice() - routes[i][j].getCostOfTransport() - providers[i].getCostOfPurchase();
 				routes[i][j].setProfit(profit);
-				System.out.println(i+" "+j+" = "+profit);
+				//System.out.println(i+" "+j+" = "+profit);
 			}
 		}
 		
-		System.out.println("==========================");
+		//System.out.println("==========================");
 		
 		while(true) {
 			
@@ -100,24 +100,24 @@ public class BrokerMethod {
 			int column = -1;
 			for(int i = 0; i < routes.length; ++i) {
 				for(int j = 0; j < routes[i].length; ++j) {
-//					System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+providers[i].getSupplyLeft()+"\t"+customers[j].getDemandLeft());
+//					//System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+providers[i].getSupplyLeft()+"\t"+customers[j].getDemandLeft());
 					if(providers[i].getSupplyLeft() <= 0)
 						continue;
 					if(customers[j].getDemandLeft() <= 0)
 						continue;
 					if(routes[i][j].getProfit() < max)
 						continue;
-					System.out.println(i+" "+j+" = "+routes[i][j].getProfit()+"\t"+max);
+					//System.out.println(i+" "+j+" = "+routes[i][j].getProfit()+"\t"+max);
 					max = routes[i][j].getProfit();
 					row = i;
 					column = j;
 				}
 			}
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
+			//System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
 			if(row < 0 || column < 0)
 				break;
 
-			System.out.println(row+" "+column+" = "+routes[row][column].getProfit());
+			//System.out.println(row+" "+column+" = "+routes[row][column].getProfit());
 			
 			double toTake;
 			if(providers[row].getSupplyLeft() < customers[column].getDemandLeft()) {
@@ -128,7 +128,7 @@ public class BrokerMethod {
 			providers[row].setSupplyLeft(providers[row].getSupplyLeft() - toTake);
 			customers[column].setDemandLeft(customers[column].getDemand() - toTake);
 			routes[row][column].setAmountOfGoods(routes[row][column].getAmountOfGoods() + toTake);
-//			System.out.println(row+" "+column+": "+routes[row][column].getAmountOfGoods()+"\t"+providers[row].getSupplyLeft()+"\t"+customers[column].getDemandLeft());
+//			//System.out.println(row+" "+column+": "+routes[row][column].getAmountOfGoods()+"\t"+providers[row].getSupplyLeft()+"\t"+customers[column].getDemandLeft());
 			
 		}
 	}
@@ -143,17 +143,31 @@ public class BrokerMethod {
 		List<Double> profitsAsList = new ArrayList<>();
 		for(int i = 0; i < routes.length; ++i) {
 			for(int j = 0; j < routes[i].length; ++j) {
-//				System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+providers[i].getSupplyLeft()+"\t"+customers[j].getDemandLeft());
+//				//System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+providers[i].getSupplyLeft()+"\t"+customers[j].getDemandLeft());
 				if(routes[i][j].getAmountOfGoods() == 0)
 					continue;
-				System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+routes[i][j].getProfit());
+				//System.out.println(i+" "+j+": "+routes[i][j].getAmountOfGoods()+"\t"+routes[i][j].getProfit());
 				++equations;
 				profitsAsList.add(routes[i][j].getProfit());
-				Double tmp[] = new Double[alfas.length+betas.length-1];
-				if(i > 0) {
-					tmp[i-1] = 1.0;
-				}
-				tmp[alfas.length+j-1] = 1.0;
+//				Double tmp[] = new Double[alfas.length+betas.length-1];
+//				if(i > 0) {
+//					tmp[i-1] = 1.0;
+//				}
+//				tmp[alfas.length+j-1] = 1.0;
+//				matrixAsList.add(tmp);
+			}
+		}
+		
+
+		int skip = alfas.length+betas.length - equations;
+		for(int i = 0; i < routes.length; ++i) {
+			for(int j = 0; j < routes[i].length; ++j) {
+				if(routes[i][j].getAmountOfGoods() == 0)
+					continue;
+				Double tmp[] = new Double[alfas.length+betas.length-skip];
+				if(i >= skip)
+					tmp[i-skip] = 1.0;
+				tmp[alfas.length+j-skip] = 1.0;
 				matrixAsList.add(tmp);
 			}
 		}
@@ -164,17 +178,17 @@ public class BrokerMethod {
 		Double[][] matrixAsArray = new Double[equations][equations];
 		matrixAsList.toArray(matrixAsArray);
 		
-		System.out.println(routes.length);
-		System.out.println(alfas.length);
-		System.out.println(betas.length);
-		System.out.println(customers.length);
-		System.out.println(providers.length);
-		System.out.println(matrixAsList.size());
-		System.out.println(profitsAsList.size());
-		System.out.println(profitsAsArray.length);
-		System.out.println(matrixAsArray.length);
+//		////System.out.println(routes.length);
+//		////System.out.println(alfas.length);
+//		////System.out.println(betas.length);
+//		////System.out.println(customers.length);
+//		////System.out.println(providers.length);
+//		////System.out.println(matrixAsList.size());
+//		////System.out.println(profitsAsList.size());
+//		////System.out.println(profitsAsArray.length);
+//		////System.out.println(matrixAsArray.length);
 		
-		//Zarowanie elementow null w tablicach
+		//Zerowanie elementow null w tablicach
 		for(int i = 0; i < matrixAsArray.length; ++i) {
 			for(int j = 0; j < matrixAsArray[i].length; ++j) {
 				if(matrixAsArray[i][j] == null)
@@ -184,26 +198,34 @@ public class BrokerMethod {
 				profitsAsArray[i] = 0.;
 		}
 		
-		for(int i = 0; i < matrixAsArray.length; ++i) {
-			for(int j = 0; j < matrixAsArray[i].length; ++j) {
-				if(matrixAsArray[i][j] != null)
-					System.out.print(matrixAsArray[i][j]);
-				System.out.print("\t");
-			}
-			System.out.println();
-		}
+//		for(int i = 0; i < matrixAsArray.length; ++i) {
+//			for(int j = 0; j < matrixAsArray[i].length; ++j) {
+//				if(matrixAsArray[i][j] != null)
+//					//System.out.print(matrixAsArray[i][j]);
+////				//System.out.print("\t");
+//			}
+////			//System.out.println();
+//		}
 		
+//		//System.out.println();
+//		for(int i = 0; i < matrixAsArray.length; ++i) {
+//			for(int j = 0; j < matrixAsArray[i].length; ++j) {
+//				//System.out.print(matrixAsArray[i][j]+"\t");
+//			}
+//			//System.out.println();
+//		}
 		Double[][] invMatrix = Matrix.inverse(matrixAsArray);
 		
-		Double[] result = new Double[equations+1];
-		result[0] = 0.;
+		Double[] result = new Double[equations+skip];
+		for(int i = 0; i < skip; ++i)
+			result[i] = 0.;
 		
 		for(int row = 0; row < invMatrix.length; ++row) {
 			double toAdd = 0;
 			for(int column = 0; column < invMatrix[row].length; ++column) {
 				toAdd += invMatrix[row][column]*profitsAsArray[column];
 			}
-			result[row+1] = toAdd;
+			result[row+skip] = toAdd;
 		}
 		
 		for(int i = 0; i < alfas.length; ++i) {
